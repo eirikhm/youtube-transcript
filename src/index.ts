@@ -30,7 +30,10 @@ export class YoutubeTranscript {
    */
   public static async fetchTranscript(
     videoId: string,
-    config?: TranscriptConfig
+    config?: TranscriptConfig,
+    requestConfig?: {
+      customFetch?: typeof fetch;
+    }
   ): Promise<TranscriptResponse[]> {
     const identifier = this.retrieveVideoId(videoId);
     try {
@@ -48,7 +51,8 @@ export class YoutubeTranscript {
         .split('"')[0];
 
       if (innerTubeApiKey && innerTubeApiKey.length > 0) {
-        const transcriptResponse = await fetch(
+        const fetchMethod = requestConfig.customFetch || fetch;
+        const transcriptResponse = await fetchMethod(
           `https://www.youtube.com/youtubei/v1/get_transcript?key=${innerTubeApiKey}`,
           {
             method: 'POST',
